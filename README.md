@@ -19,6 +19,20 @@ A demonstration of Vigil detecting occupancy, transitioning between states, and 
 
 ---
 
+# Hardware Setup
+
+## Complete Setup
+
+![Vigil top-down setup](images/Topdown.jpg)
+
+## OLED Display
+
+![OLED display showing occupancy state](images/OLED.jpg)
+
+## Sensor Arrangement
+
+![Vigil sensor arrangement](images/Angle.jpg)
+
 ## Features
 
 - ESP32-based embedded system
