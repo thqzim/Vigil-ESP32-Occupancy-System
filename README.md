@@ -233,28 +233,32 @@ GND → Ground rail
 # Software Structure
 
 ```
-src/
+Vigil/
 
-├── Vigil.ino
+├── README.md
 
-├── PIRSensor.h
-├── PIRSensor.cpp
+├── LICENSE
 
-├── UltrasonicSensor.h
-├── UltrasonicSensor.cpp
-
-├── Logic.h
-├── Logic.cpp
-
-├── OLEDDisplay.h
-├── OLEDDisplay.cpp
-
-├── Tasks.h
-├── Tasks.cpp
-
-├── SharedData.h
-
-└── SystemState.h
+├── src/
+│
+│   ├── Vigil.ino
+│   ├── PIRSensor.h
+│   ├── PIRSensor.cpp
+│   ├── UltrasonicSensor.h
+│   ├── UltrasonicSensor.cpp
+│   ├── Logic.h
+│   ├── Logic.cpp
+│   ├── OLEDDisplay.h
+│   ├── OLEDDisplay.cpp
+│   ├── Tasks.h
+│   ├── Tasks.cpp
+│   ├── SharedData.h
+│   └── SystemState.h
+│
+└── images/
+    ├── top_down.jpg
+    ├── oled.jpg
+    └── sensors.jpg
 ```
 
 ---
