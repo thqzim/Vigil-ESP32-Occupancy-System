@@ -1,128 +1,289 @@
-# Vigil-ESP32-Occupancy-System
-ESP32-based real-time occupancy detection system using FreeRTOS, PIR and ultrasonic sensors, and a confidence-based sensor fusion algorithm.
+# Vigil — ESP32 Distributed IoT Occupancy Monitoring System
 
-# Vigil
+An ESP32-based distributed embedded IoT occupancy monitoring system using **FreeRTOS**, **sensor fusion**, **ESP-NOW wireless communication**, and a **real-time web dashboard**.
 
-## ESP32-Based Real-Time Occupancy Detection System
-
-Vigil is an embedded occupancy monitoring system built using an ESP32 microcontroller, PIR motion sensor, ultrasonic distance sensor, and SSD1306 OLED display.
-
-The system uses FreeRTOS multitasking and a confidence-based sensor fusion algorithm to estimate occupancy state in real time. Sensor data is processed independently through dedicated tasks, synchronized through shared data protection, and displayed through an OLED interface.
+Vigil evolved from a single-node embedded occupancy detector into a **two-node distributed architecture**, separating sensing and user interaction into dedicated ESP32 devices.
 
 ---
 
-## Demo
+# Overview
 
-A demonstration of Vigil detecting occupancy, transitioning between states, and recovering from changing sensor conditions:
+Vigil is a real-time occupancy monitoring system designed around modern embedded systems principles.
 
-[Watch the Vigil Demo](https://www.youtube.com/shorts/QiySP-mDp18)
+The system consists of two ESP32-based nodes:
+
+- **Sensor Node (ESP32)** – Collects environmental data, performs occupancy estimation, and wirelessly transmits occupancy information.
+- **Hub Node (ESP32-S3)** – Receives occupancy packets, displays the current state on an OLED display, and hosts a real-time mobile dashboard over WiFi.
+
+The project demonstrates:
+
+- Embedded firmware architecture
+- FreeRTOS multitasking
+- Sensor fusion
+- Distributed embedded communication
+- ESP-NOW wireless networking
+- IoT dashboard development
 
 ---
 
-# Hardware Setup
+# Project Evolution
 
-## Complete Setup
+## Vigil V1
 
-![Vigil top-down setup](images/Topdown.jpg)
+The original Vigil prototype was a **single-node embedded occupancy detector**.
+
+Features:
+
+- ESP32
+- FreeRTOS multitasking
+- PIR motion sensing
+- Ultrasonic distance sensing
+- Confidence-based sensor fusion
+- OLED display
+- Mutex-protected shared data
+
+Repository:
+
+```
+src/
+```
+
+---
+
+## Vigil V2 (Current)
+
+Vigil V2 transforms the system into a **distributed embedded IoT architecture**.
+
+New additions include:
+
+- ESP-NOW wireless communication
+- Dedicated Sensor Node
+- Dedicated Hub Node
+- ESP32-S3 OLED Hub
+- WiFi mobile dashboard
+- Connection timeout detection
+- Modular communication architecture
+
+Repository:
+
+```
+Vigil_V2/
+
+├── Vigil_Sensor/
+└── Vigil_Hub/
+```
+
+---
+
+# Demo
+
+A complete demonstration of Vigil V2:
+
+- Occupancy detection
+- Wireless ESP-NOW communication
+- OLED updates
+- Mobile dashboard updates
+
+▶ **Watch the Demo**
+
+https://www.youtube.com/shorts/r9fqNDjZBhg
+
+---
+
+# Hardware
+
+## Sensor Node
+
+Responsible for:
+
+- Motion detection
+- Distance measurement
+- Sensor fusion
+- Occupancy estimation
+- ESP-NOW transmission
+
+### Hardware
+
+- ESP32 DevKit
+- HC-SR501 PIR Sensor
+- HC-SR04 Ultrasonic Sensor
+
+---
+
+## Hub Node
+
+Responsible for:
+
+- ESP-NOW reception
+- OLED interface
+- WiFi connectivity
+- Mobile dashboard
+
+### Hardware
+
+- ESP32-S3
+- SSD1306 OLED Display
+
+---
+
+# Hardware Images
+
+## Sensor Node
+
+![Sensor Node](images/Vigil_V2_Sensors.jpg)
+
+---
+
+## Hub Node
+
+![Hub Node](images/Vigil_V2_OLED.jpg)
+
+---
+
+# Mobile Dashboard
+
+The Hub Node hosts a lightweight HTTP server that exposes the occupancy state through a mobile-friendly dashboard.
+
+## Occupied
+
+![Occupied Dashboard](images/occupied.jpg)
+
+---
+
+## Transition
+
+![Transition Dashboard](images/transition.jpg)
+
+---
+
+## Empty
+
+![Empty Dashboard](images/empty.jpg)
+
+---
+
+# Features
+
+## Embedded Systems
+
+- ESP32
+- ESP32-S3
+- FreeRTOS
+- Modular C++ architecture
+- Mutex-protected shared data
+
+---
+
+## Sensor Fusion
+
+Occupancy estimation combines:
+
+- PIR motion events
+- Ultrasonic distance confirmation
+
+instead of relying on a single sensor.
+
+---
+
+## Distributed Architecture
+
+The project separates sensing and visualization.
+
+```
+Sensor Node
+     │
+     │
+ ESP-NOW
+     │
+     ▼
+Hub Node
+```
+
+This architecture allows sensing hardware to be deployed independently from the user interface.
+
+---
+
+## Wireless Communication
+
+Uses **ESP-NOW** for low-latency communication between ESP32 devices.
+
+Advantages:
+
+- No router required between nodes
+- Low latency
+- Lightweight communication
+- Reliable short-range wireless networking
+
+---
+
+## Mobile Dashboard
+
+The Hub Node connects to WiFi and hosts an HTTP server.
+
+Any device connected to the same network can monitor occupancy in real time.
+
+---
 
 ## OLED Display
 
-![OLED display showing occupancy state](images/OLED.jpg)
+The Hub provides a local display showing:
 
-## Sensor Arrangement
-
-![Vigil sensor arrangement](images/Angle.jpg)
-
-## Features
-
-- ESP32-based embedded system
-- FreeRTOS multitasking architecture
-- PIR motion detection
-- Ultrasonic distance measurement
-- Confidence-based sensor fusion algorithm
-- Real-time occupancy state estimation
-- SSD1306 OLED status display
-- Mutex-protected shared data communication
-- Modular C++ class-based design
-
----
-
-# System Overview
-
-Vigil determines occupancy by combining multiple sensor inputs instead of relying on a single sensor.
-
-The system uses:
-
-- PIR sensor → detects motion events
-- Ultrasonic sensor → confirms physical presence
-- Logic layer → combines sensor evidence into a confidence score
-- OLED display → shows current occupancy state
-
-The occupancy state is represented using three possible states:
-
-| State | Description |
-|---|---|
-| EMPTY | No evidence of occupancy |
-| TRANSITION | Confidence is changing between states |
-| OCCUPIED | Strong evidence of occupancy |
+- Current state
+- Confidence percentage
+- Connection status
 
 ---
 
 # System Architecture
 
+```text
+                 SENSOR NODE (ESP32)
+
+          PIR Sensor      Ultrasonic
+               │              │
+               └──────┬───────┘
+                      │
+               Sensor Fusion
+                      │
+          Confidence State Machine
+                      │
+               FreeRTOS Tasks
+                      │
+               ESP-NOW Sender
+                      │
+══════════════════════════════════════════════
+
+                  ESP-NOW
+
+══════════════════════════════════════════════
+
+                 HUB NODE (ESP32-S3)
+
+              ESP-NOW Receiver
+                      │
+             Occupancy Manager
+                 │          │
+                 │          │
+              OLED      HTTP Server
+                             │
+                             ▼
+                    Mobile Dashboard
 ```
-                 PIR Sensor
-                     |
-                     |
-                     v
-
-              PIR Sensor Task
-
-
-            Ultrasonic Sensor
-                     |
-                     |
-                     v
-
-          Ultrasonic Sensor Task
-
-
-                     |
-                     v
-
-              Logic Processing Task
-
-                     |
-                     v
-
-             OccupancyData Structure
-
-                     |
-              Mutex Protected
-
-                     |
-                     v
-
-               OLED Display Task
-```
-
-Each subsystem runs independently using FreeRTOS tasks.
 
 ---
 
-# FreeRTOS Task Design
+# FreeRTOS Design
 
-Vigil separates system functionality into multiple concurrent tasks.
+## Sensor Node
 
-## PIR Task
+### PIR Task
 
 Responsibilities:
 
-- Continuously samples the PIR sensor
 - Detects motion events
 - Updates motion state
 
-Task interval:
+Update rate:
 
 ```
 100 ms
@@ -130,15 +291,15 @@ Task interval:
 
 ---
 
-## Ultrasonic Task
+### Ultrasonic Task
 
 Responsibilities:
 
-- Measures distance readings
-- Filters unstable measurements
-- Provides presence confirmation
+- Measures distance
+- Filters unstable readings
+- Confirms physical presence
 
-Task interval:
+Update rate:
 
 ```
 1000 ms
@@ -146,173 +307,194 @@ Task interval:
 
 ---
 
-## Logic Task
+### Logic Task
 
 Responsibilities:
 
 - Combines sensor evidence
-- Updates occupancy confidence
-- Determines current system state
-
-The confidence model prevents immediate state changes caused by temporary sensor noise.
+- Updates confidence
+- Determines occupancy state
+- Sends occupancy packets via ESP-NOW
 
 ---
 
-## OLED Task
+## Hub Node
+
+### OLED Task
 
 Responsibilities:
 
-- Reads occupancy data
+- Retrieves latest occupancy packet
 - Displays:
-  - Current occupancy state
-  - Confidence percentage
+
+  - State
+  - Confidence
+  - Connection status
+
+Update rate:
+
+```
+200 ms
+```
 
 ---
 
 # Occupancy Algorithm
 
-Vigil uses a confidence-based decision model.
+Instead of switching immediately, Vigil maintains a confidence score.
 
-Sensor evidence modifies the confidence value:
+Evidence:
 
 ```
-Motion detected:
-+30 confidence
+PIR Motion Event
 
-Ultrasonic confirmation:
-+40 confidence
++30
 ```
 
-Confidence decreases over time when evidence is no longer present.
+```
+Ultrasonic Presence
+
++20
+```
+
+Confidence naturally decays over time:
+
+```
+-5
+```
 
 State thresholds:
 
 ```
-Confidence >= 70%
-        |
-        v
-    OCCUPIED
+Confidence ≥ 70%
 
-
-30% < Confidence < 70%
-        |
-        v
-    TRANSITION
-
-
-Confidence <= 30%
-        |
-        v
-      EMPTY
+OCCUPIED
 ```
 
-This approach prevents rapid switching caused by individual sensor inaccuracies.
+```
+30 < Confidence < 70
+
+TRANSITION
+```
+
+```
+Confidence ≤ 30
+
+EMPTY
+```
+
+This approach prevents rapid switching caused by temporary sensor noise.
 
 ---
 
-# Hardware
+# Connection Monitoring
 
-## Components
+The Hub tracks the timestamp of the last received ESP-NOW packet.
 
-| Component | Purpose |
-|---|---|
-| ESP32 DevKit | Main microcontroller |
-| HC-SR501 PIR Sensor | Motion detection |
-| HC-SR04 Ultrasonic Sensor | Distance-based presence detection |
-| SSD1306 OLED Display | User interface |
-| Breadboard | Prototyping |
-| Jumper Wires | Connections |
+If communication is lost for more than five seconds:
+
+```
+NO_SIGNAL
+```
+
+is displayed instead of assuming the room is empty.
 
 ---
 
-# Pin Configuration
+# Repository Structure
 
-| Component | ESP32 Pin |
-|---|---|
-| PIR Signal | GPIO 4 |
-| Ultrasonic Trigger | GPIO 5 |
-| Ultrasonic Echo | GPIO 18 |
-| OLED SDA | GPIO 21 |
-| OLED SCL | GPIO 22 |
-
-Power connections:
-
-```
-VCC → Power rail
-GND → Ground rail
-```
-
----
-
-# Software Structure
-
-```
+```text
 Vigil/
 
 ├── README.md
-
 ├── LICENSE
-
-├── src/
 │
-│   ├── Vigil.ino
-│   ├── PIRSensor.h
-│   ├── PIRSensor.cpp
-│   ├── UltrasonicSensor.h
-│   ├── UltrasonicSensor.cpp
-│   ├── Logic.h
-│   ├── Logic.cpp
-│   ├── OLEDDisplay.h
-│   ├── OLEDDisplay.cpp
-│   ├── Tasks.h
-│   ├── Tasks.cpp
-│   ├── SharedData.h
-│   └── SystemState.h
+├── src/
+│   └── Vigil V1 (Original Single-Node Implementation)
+│
+├── Vigil_V2/
+│   ├── Vigil_Sensor/
+│   │
+│   │   ├── Vigil_Sensor.ino
+│   │   ├── ESPNowSender.*
+│   │   ├── PIRSensor.*
+│   │   ├── UltrasonicSensor.*
+│   │   ├── Logic.*
+│   │   ├── Tasks.*
+│   │   ├── SharedData.h
+│   │   └── SystemState.h
+│   │
+│   └── Vigil_Hub/
+│
+│       ├── Vigil_Hub.ino
+│       ├── ESPNowReceiver.*
+│       ├── OLEDDisplay.*
+│       ├── OccupancyManager.*
+│       ├── Tasks.*
+│       ├── dashboard.h
+│       ├── SharedData.h
+│       └── SystemState.h
 │
 └── images/
-    ├── top_down.jpg
-    ├── oled.jpg
-    └── sensors.jpg
+    ├── Vigil_V2_Sensors.jpg
+    ├── Vigil_V2_OLED.jpg
+    ├── occupied.jpg
+    ├── transition.jpg
+    ├── empty.jpg
+    └── Demo.mp4
 ```
-
----
-
-# Dependencies
-
-Required Arduino libraries:
-
-- Adafruit SSD1306
-- Adafruit GFX Library
-
-The ESP32 Arduino Core provides built-in FreeRTOS support.
-
----
-
-# Future Improvements
-
-Planned improvements:
-
-- ESP-NOW wireless communication between multiple Vigil nodes
-- Distributed occupancy monitoring network
-- Battery-powered operation
-- Improved sensor calibration
-- Data logging and analytics
-- Web dashboard integration
 
 ---
 
 # Technologies Used
 
-- C++
+Embedded Systems
+
 - ESP32
+- ESP32-S3
 - FreeRTOS
+- C++
+
+Communication
+
+- ESP-NOW
+- WiFi
+- HTTP Server
+- I²C
+
+Sensors
+
+- PIR Motion Sensor
+- HC-SR04 Ultrasonic Sensor
+
+User Interface
+
+- SSD1306 OLED
+- Mobile Web Dashboard
+
+Software Concepts
+
 - Sensor Fusion
-- Real-Time Embedded Systems
-- I2C Communication
-- Embedded Multitasking
+- Confidence-Based State Machine
+- Distributed Embedded Systems
+- Real-Time Multitasking
+- Mutex Synchronization
+
+---
+
+# Future Improvements
+
+Potential future extensions include:
+
+- Multi-room occupancy network
+- Data logging
+- Historical occupancy analytics
+- Industrial communication protocols (UART, SPI, RS-485)
+- Battery-powered sensor nodes
+- Additional environmental sensors
 
 ---
 
 # Author
 
-Built as an embedded systems project focused on real-time sensing, multitasking, and sensor-based decision making.
+Vigil was developed as an embedded systems project exploring real-time firmware architecture, distributed wireless communication, sensor fusion, and IoT-based occupancy monitoring.
